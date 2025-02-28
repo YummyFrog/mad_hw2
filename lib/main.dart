@@ -29,17 +29,64 @@ class CalculatorScreen extends StatefulWidget {
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
   String _display = '0';
+  String _operator = '';
+  double _firstOperand = 0;
+  double _secondOperand = 0;
+  bool _isOperatorPressed = false;
 
   void _onButtonPressed(String buttonText) {
     setState(() {
       if (buttonText == 'C') {
         _display = '0';
-      } else if (_display == '0') {
-        _display = buttonText;
+        _operator = '';
+        _firstOperand = 0;
+        _secondOperand = 0;
+        _isOperatorPressed = false;
+      } else if (buttonText == '+' || buttonText == '-' || buttonText == '*' || buttonText == '/') {
+        if (_operator.isNotEmpty) {
+          _calculateResult();
+        }
+        _operator = buttonText;
+        _firstOperand = double.parse(_display);
+        _isOperatorPressed = true;
+      } else if (buttonText == '=') {
+        _calculateResult();
+        _operator = '';
+        _isOperatorPressed = false;
       } else {
-        _display += buttonText;
+        if (_display == '0' || _isOperatorPressed) {
+          _display = buttonText;
+          _isOperatorPressed = false;
+        } else {
+          _display += buttonText;
+        }
       }
     });
+  }
+
+  void _calculateResult() {
+    _secondOperand = double.parse(_display);
+    switch (_operator) {
+      case '+':
+        _display = (_firstOperand + _secondOperand).toString();
+        break;
+      case '-':
+        _display = (_firstOperand - _secondOperand).toString();
+        break;
+      case '*':
+        _display = (_firstOperand * _secondOperand).toString();
+        break;
+      case '/':
+        if (_secondOperand == 0) {
+          _display = 'Error';
+        } else {
+          _display = (_firstOperand / _secondOperand).toString();
+        }
+        break;
+      default:
+        break;
+    }
+    _firstOperand = double.parse(_display);
   }
 
   Widget _buildButton(String buttonText) {
